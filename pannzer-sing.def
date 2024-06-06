@@ -1,0 +1,38 @@
+Bootstrap: docker
+From: ubuntu:latest
+
+%post
+    # Update and install necessary dependencies
+    apt-get update
+    apt-get install -y wget tar perl libswitch-perl python3.10 python3-numpy python3-scipy python3-requests python3-fastcluster 
+
+    # Download and extract Pannzer
+    wget http://ekhidna2.biocenter.helsinki.fi/sanspanz/SANSPANZ.3.tar.gz
+    tar -zxvf SANSPANZ.3.tar.gz
+    
+    mv SANSPANZ.3 /usr/local/SANSPANZ
+    
+    # Create a wrapper script for runsanspanz.py
+    echo '#!/bin/bash' > /usr/local/bin/runsanspanz.py
+    echo 'python3 /usr/local/SANSPANZ/runsanspanz.py "$@"' >> /usr/local/bin/runsanspanz.py
+    chmod a+rX /usr/local/SANSPANZ
+    chmod a+rx /usr/local/SANSPANZ/*
+    chmod a+rx /usr/local/SANSPANZ/*/*
+    chmod a+rx /usr/local/bin/runsanspanz.py
+    
+    # Correct bug
+    
+    sed -i '65s/numpy\.int/int/' /usr/local/SANSPANZ/operators/Clustering.py
+  
+    
+    # Create a wrapper script for anno2html.pl
+    echo '#!/bin/bash' > /usr/local/bin/anno2html.pl
+    echo 'perl /usr/local/SANSPANZ/anno2html.pl "$@"' >> /usr/local/bin/anno2html.pl
+    chmod a+rx /usr/local/bin/anno2html.pl
+    
+    
+
+%environment
+    # Set environment variables if needed
+
+
